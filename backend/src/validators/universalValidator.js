@@ -8,6 +8,7 @@ module.exports = {
             first_name: Joi.string().optional(),
             last_name: Joi.string().optional(),
             username: Joi.string().optional(),
+            receiver_name: Joi.optional(),
             id: Joi.optional(),
             password: Joi.optional(),
             depo_boss_id: Joi.optional(),

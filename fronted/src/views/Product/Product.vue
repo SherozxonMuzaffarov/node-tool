@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Add Product</h1>
+    <h5>Add Product</h5>
     <form @submit.prevent="addProduct">
       <label for="name">Name:</label>
       <input type="text" v-model="formData.name" required>
@@ -13,43 +13,48 @@
 
       <button type="submit">Add Product</button>
     </form>
-    <h1>Product List</h1>
-    <div class="d-flex align-items-center column-gap-2">
-      <p class="lead m-0">
-        <i class="bi bi-house-door-fill"></i>Sexdagi mavjud shablonlar
-      </p>
-      <button class="btn btn-success" @click="$router.push('/product/create')">
-        <i class="bi bi-plus-lg"></i>
-      </button>
-    </div>
-    <h2>Product List</h2>
-    <BTableSimple striped hover bordered class="mt-4">
+    
+    <h4>Product List</h4>
+    <BTableSimple striped hover bordered class="mt-4 product-table">
       <BThead>
-        <BTh>ID</BTh>
-        <BTh>FIO</BTh>
-        <BTh>Soni</BTh>
-        <BTh>PRODUCT NAME</BTh>
+        <BTh class="col-1">ID</BTh>
+        <BTh class="col-1">Berilgan vaqti</BTh>
+        <BTh class="col-1">Image</BTh>
+        <BTh class="col-2">FIO</BTh>
+        <BTh class="col-2">PRODUCT NAME</BTh>
+        <BTh class="col-1">Soni</BTh>
+        <BTh class="col-1">status</BTh>
+        <BTh class="col-1">Qaytarga vaqti</BTh>
+        <BTh class="col-1">Qolgan vaqti</BTh>
         <BTh class="btns"></BTh>
         <BTh class="btns"></BTh>
       </BThead>
       <BTbody>
         <BTr v-for="(item, index) in products" :key="item._id">
           <BTh>{{ index + 1 }}</BTh>
-          <BTd>{{ item.receiver_name }}</BTd>
-          <BTd>{{ item?.quantity }}</BTd>
-          <BTd>{{ item?.name }}</BTd>
-          <BTd class="btns">
-            <BButton @click="nestedModal1 = !nestedModal1">open Camera</BButton>
-            <!-- <WebCamera @photoCaptured="onPhotoCaptured" /> -->
-            <!-- <button @click="getOne(item._id)" class="btn btn-primary m-0">
-              <i class="bi bi-pen-fill"></i>
-            </button> -->
+          <BTd class="col-1">{{ item.createdAt}}</BTd>
+          <BTd class="col-1">
+            <img v-if="item.receiver_image" :src="'data:image/jpeg;base64,' + item.receiver_image" :alt="item.receiver_image">
+            <BButton v-else @click="nestedModal1 = !nestedModal1" class="sm"><i class="bi bi-camera"></i></BButton>
           </BTd>
+          <BTd class="col-2">{{ item.receiver_name }}</BTd>
+          <BTd>{{ item?.name }}</BTd>
+          <BTd class="col-1">{{ item?.quantity }}</BTd>
           <BTd class="btns">
+            <button v-if="item.is_returned" class="btn btn-success m-0" >
+              <i  class="bi bi-person-check-fill"></i>
+            </button>
+            <button v-else class="btn btn-danger m-0" @click="giveBack(item._id)">
+              <i  class="bi bi-person-x-fill"></i>
+            </button>
+          </BTd>
+          <BTd class="col-1">{{ item?.returned_date }}</BTd>
+          <BTd class="col-1">{{ item?.daysRemaining }} kun</BTd>
+          <!-- <BTd class="btns">
             <button @click="deleteItem(item._id)" class="btn btn-danger m-0">
               <i class="bi bi-trash-fill"></i>
             </button>
-          </BTd>
+          </BTd> -->
         </BTr>
       </BTbody>
     </BTableSimple>
@@ -58,8 +63,8 @@
       <label for="webcam">Take Photo:</label>
       <WebCamera />
     </BModal>
-
   </div>
+  {{ products }}
 </template>
 
 <script setup>
@@ -80,6 +85,7 @@ const getAll = async () => {
   try {
     const res = await axios.get('/product/all');
     if(res.data){
+      console.log(res.data);
       products.value = res.data;
     }
   } catch (error) {
@@ -100,39 +106,6 @@ const addProduct = async () => {
   } catch (error) {
     console.error(error);
   }
-};
-
-// getOne;
-let getOne = async (id) => {
-    try {
-        let res = await axios.put("/product/update/" + id, );
-        if (res.data) {
-            FormData.value = res.data;
-            modalUpdate.value = !modalUpdate.value;
-        }
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-// update
-const handleUpdate = async () => {
-    let id = formData.value._id;
-    try {
-        let res = await axios.patch("/product/update/" + id, formData.value);
-        if (res) {
-            getAll();
-            modalUpdate.value = !modalUpdate.value;
-            formData.value.id = null;
-            formData.value.name = null;
-            formData.value.region_id = null, 
-            formData.value.depo_boss_id = null,
-            formData.value.depo_sklad_xodim_id = null
-        }
-        
-    } catch (error) {
-        console.error(error);
-    }
 };
 
 //delete
@@ -156,7 +129,34 @@ const deleteItem = async (id) => {
     }
 };
 
+//giveBack
+const giveBack = async (id) => {
+    try {
+        if (!id) return;
+        let confirmDelete = confirm("Vaqtida qaytarildimi?");
+        if (confirmDelete) {
+            try {
+                let res = await axios.put("/product/update/" + id + '/return');
+                alert("Ma'lumot Saqlandi");
+                getAll();
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.log("Delete cancelled");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 onMounted(async () => {
   getAll()
 });
 </script>
+
+<style scoped>
+  .product-table img {
+    max-height: 3rem /* Set the maximum height of the image to 100% of its container */
+  }
+</style>

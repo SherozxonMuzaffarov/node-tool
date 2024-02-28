@@ -136,7 +136,7 @@ formData.append("image", blob, "my-photo.jpeg"); // Use the same field name as i
 
   // Send the FormData to the server
   try {
-    const res = await axios.put("/product/update/1", formData);
+    const res = await axios.put("/product/update/65ded1b5d28b0066df4bf1ee", formData);
     console.log(res.data); // Handle the server response as needed
   } catch (error) {
     console.error("Error sending image to the server:", error);
