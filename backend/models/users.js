@@ -15,10 +15,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  depo_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Depo',
-    default: null
+  depo: {
+    type: String,
+    enum: ['O\'zvagonta\'mir', 'VCHD-3', 'VCHD-5', 'VCHD-6'],
+    required: true
   },
   role: {
     type: String,

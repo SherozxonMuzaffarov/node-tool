@@ -63,7 +63,7 @@ module.exports = {
 
   getAll: async (req, res) => {
     try {
-      let model = await User.find({}).populate('depo_id', 'name');
+      let model = await User.find({});
       res.send(model);
     } catch (error) {
       console.error(error);
@@ -105,7 +105,7 @@ module.exports = {
 
   getUserId: async (req, res) => {
     try {
-      let model = await User.findById(req.user.id).populate('depo', ['id', 'name']);
+      let model = await User.findById(req.user.id);
 
       if (!model) {
         res.status(404).json({
@@ -121,7 +121,7 @@ module.exports = {
 
   create: async (req, res) => {
     try {
-      let { name, phone_number, password, depo_id, role } = req.body;
+      let { name, phone_number, password, depo, role } = req.body;
 
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -131,7 +131,7 @@ module.exports = {
         name,
         phone_number,
         password: hashedPassword,
-        depo_id,
+        depo,
         role,
       });
 
@@ -145,11 +145,11 @@ module.exports = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, phone_number, password, depo_id, role } = req.body;
+      const { name, phone_number, password, depo, role } = req.body;
 
       const updatedModel = await User.findByIdAndUpdate(
         id,
-        { name, phone_number, password, depo_id, role },
+        { name, phone_number, password, depo, role },
         { new: true }
       );
 

@@ -11,33 +11,13 @@ const router = createRouter({
                 {
                     path: "/product",
                     name: "/product",
-                    component: () => import("../views/Product/Product.vue"),
-                },
-                {
-                    path: "/product/create",
-                    name: "ProductCreate",
-                    component: () => import("../views/Product/Create.vue"),
-                },
-                {
-                    path: "/metrology-sklad",
-                    name: "/metrology-sklad",
-                    component: () => import("../views/MetrologySklad.vue"),
+                    component: () => import("../views//Product.vue"),
                 },
                 {
                     path: "/user",
                     name: "/user",
                     component: () => import("../views/User.vue"),
                 },
-                {
-                    path: "/region",
-                    name: "/region",
-                    component: () => import("../views/Region.vue"),
-                },
-                {
-                    path: "/depo",
-                    name: "/depo",
-                    component: () => import("../views/Depo.vue"),
-                }
             ],
         },
         {

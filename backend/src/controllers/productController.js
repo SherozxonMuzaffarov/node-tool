@@ -10,16 +10,15 @@ const readFile = util.promisify(fs.readFile);
 module.exports = {
     getAll: async (req, res) => {
         try {
-            const user = myCache.get('userData');
-            let model;
+            const { depo } = req.query
+
+            // Construct the query object based on provided parameters
+            const query = {
+                ...(depo && depo !== "O'zvagonta'mir" && { depo })
+            };
     
-            model = await Product.find({});
-            // if (user.role === 'Admin') {
-            // } else {
-            //     model = await Product.where('depo_id').equals(user.depo_id);
-            // }
-    
-            // Map over each product and add image data
+            const model = await Product.find(query).sort({ createdAt: -1 });;
+            
             const productsWithImages = await Promise.all(model.map(async (product) => {
                 const createdAtDate = new Date(product.createdAt);
                 const expirationDate = new Date(createdAtDate);
@@ -72,14 +71,18 @@ module.exports = {
 
     create: async (req, res) => {
         try {
-            const { name, quantity, receiver_name } = req.body;
-            const product = await Product.create({
-                name,
-                quantity,
-                receiver_name,
-                is_returned: false,
-              })
-            res.json(product);
+            const { name, quantity, receiver_name, depo } = req.body;
+
+            if (depo != 'O\'zvagonta\'mir') {
+                const product = await Product.create({
+                    name,
+                    quantity,
+                    receiver_name,
+                    is_returned: false,
+                    depo
+                  })
+                res.json(product);
+            }
           } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -93,6 +96,7 @@ module.exports = {
             
             // Update the product with the received ID
             const productId = req.params.id;
+
             const updatedProduct = await Product.findByIdAndUpdate(
                 productId,
                 { receiver_image: req.file.filename },

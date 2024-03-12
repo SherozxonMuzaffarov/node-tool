@@ -17,22 +17,16 @@
       okTitle="Saqlash"
     >
       <BFormInput v-model="FormData.name" placeholder="FIO" class="mb-3" />
-      <BFormInput
-        v-model="FormData.phone_number"
-        placeholder="telefon raqami"
-        class="mb-3"
-      />
+      <BFormInput v-model="FormData.phone_number" placeholder="telefon raqami" class="mb-3"/>
       <BFormInput v-model="FormData.password" placeholder="parol" class="mb-3" />
 
-      <BFormSelect v-model="FormData.depo_id" :options="depos" class="mb-3">
-        <!-- This slot appears above the options from 'options' prop -->
+      <BFormSelect v-model="FormData.depo" :options="depos" class="mb-3" >
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Depo --</BFormSelectOption>
         </template>
       </BFormSelect>
-
+        
       <BFormSelect v-model="FormData.role" :options="roles" class="mb-3">
-        <!-- This slot appears above the options from 'options' prop -->
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Role --</BFormSelectOption>
         </template>
@@ -55,17 +49,14 @@
         placeholder="telefon raqami"
         class="mb-3"
       />
-      <BFormInput v-model="FormData.password" placeholder="paroli" class="mb-3" />
 
-      <BFormSelect v-model="FormData.depo_id" :options="depos" class="mb-3">
-        <!-- This slot appears above the options from 'options' prop -->
+      <BFormSelect v-model="FormData.depo" :options="depos" class="mb-3" >
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Depo --</BFormSelectOption>
         </template>
       </BFormSelect>
-
+        
       <BFormSelect v-model="FormData.role" :options="roles" class="mb-3">
-        <!-- This slot appears above the options from 'options' prop -->
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Role --</BFormSelectOption>
         </template>
@@ -89,7 +80,7 @@
           <BTh class="id-tr">{{ index + 1 }}</BTh>
           <BTd>{{ item.name }}</BTd>
           <BTd>{{ item.phone_number }}</BTd>
-          <BTd>{{ item?.depo_id?.name }}</BTd>
+          <BTd>{{ item?.depo }}</BTd>
           <BTd>{{ item.role }}</BTd>
           <BTd class="btns">
             <button @click="getOne(item._id)" class="btn btn-primary m-0">
@@ -113,7 +104,6 @@ import { ref, onMounted } from "vue";
 import axios from "axios";
 const modalCreate = ref(false);
 const modalUpdate = ref(false);
-const modalDelete = ref(false);
 const Data = ref([]);
 
 const FormData = ref({
@@ -121,11 +111,17 @@ const FormData = ref({
   name: null,
   phone_number: null,
   password: null,
-  depo_id: null,
+  depo: null,
   role: null,
 });
 
-let depos = ref();
+let depos = ref([
+  {value: 'O\'zvagonta\'mir', text: 'O\'zvagonta\'mir'},
+  {value: 'VCHD-3', text: 'VCHD-3'},
+  {value: 'VCHD-5', text: 'VCHD-5'},
+  {value: 'VCHD-6', text: 'VCHD-6'},
+]);
+
 
 const roles = ref([
   { value: "Admin", text: "Admin" },
@@ -135,17 +131,12 @@ const roles = ref([
 //create
 const handleOk = async () => {
   try {
-    console.log("FormData.value:   " + FormData.value);
+    
     let res = await axios.post("/user/create", FormData.value);
     if (res) {
       getAll();
       modalCreate.value = !modalCreate.value;
-      FormData.value._id = null;
-      FormData.value.name = null;
-      (FormData.value.phone_number = null),
-        (FormData.value.password = null),
-        (FormData.value.depo_id = null),
-        (FormData.value.role = null);
+      makeFormDataNull()
     }
   } catch (error) {
     console.error(error);
@@ -156,21 +147,28 @@ const handleOk = async () => {
 const handleUpdate = async () => {
   let id = FormData.value._id;
   try {
+
+    console.log("FormData.value:   " + FormData.value);
     let res = await axios.patch("/user/update/" + id, FormData.value);
     if (res) {
       getAll();
       modalUpdate.value = !modalUpdate.value;
-      FormData.value.id = null;
-      FormData.value.name = null;
-      (FormData.value.phone_number = null),
-        (FormData.value.password = null),
-        (FormData.value.depo_id = null),
-        (FormData.value.role = null);
+      makeFormDataNull()
+      
     }
   } catch (error) {
     console.error(error);
   }
 };
+
+const makeFormDataNull = () => {
+  FormData.value.id = null;
+  FormData.value.name = null;
+  FormData.value.phone_number = null,
+  FormData.value.password = null,
+  FormData.value.depo = null,
+  FormData.value.role = null;
+}
 
 //delete
 const deleteItem = async (id) => {
@@ -218,23 +216,10 @@ let getOne = async (id) => {
   }
 };
 
-//getAllDepos
-let getAllDepos = async () => {
-  try {
-    let res = await axios.get("/depo/all");
-    if (res.data) {
-      depos = res.data.map(function (depo) {
-        return { text: depo.name, value: depo._id };
-      });
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
+
 
 onMounted(() => {
   getAll();
-  getAllDepos();
 });
 </script>
 

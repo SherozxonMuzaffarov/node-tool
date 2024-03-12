@@ -23,7 +23,7 @@ module.exports = {
             soni: Joi.number().optional(),
             ishlabChiqarilganYili: Joi.number().optional(),
             number: Joi.number().optional(),
-            depo_id: Joi.optional(),
+            depo: Joi.string().optional(),
             role: Joi.optional(),
             raqami: Joi.optional(),
             turi: Joi.optional(),

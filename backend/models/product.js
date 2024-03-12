@@ -9,6 +9,11 @@ const productSchema = new mongoose.Schema({
   receiver_image: String,
   returned_date: Date,
   is_returned: Boolean,
+  depo: {
+    type: String,
+    enum: ['VCHD-3', 'VCHD-5', 'VCHD-6'],
+    required: true
+  },
 },{
   timestamps: true
 });
